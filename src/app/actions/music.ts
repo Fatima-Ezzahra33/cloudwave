@@ -104,3 +104,37 @@ export const removeSongFromPlaylist = actionClient
     revalidatePath(`/playlist/${playlistId}`);
     return { success: true };
   });
+export const getUserMetadata = actionClient
+  .action(async () => {
+    const session = await auth();
+    if (!session?.user?.id) return { likedSongIds: [], playlists: [] };
+
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        likedSongs: { select: { id: true } },
+        playlists: { select: { id: true, name: true } }
+      }
+    });
+
+    return {
+      likedSongIds: user?.likedSongs.map(s => s.id) || [],
+      playlists: user?.playlists || []
+    };
+  });
+export const createPlaylist = actionClient
+  .schema(z.object({ name: z.string() }))
+  .action(async ({ parsedInput: { name } }) => {
+    const session = await auth();
+    if (!session?.user?.id) throw new Error("Unauthorized");
+
+    const playlist = await prisma.playlist.create({
+      data: {
+        name,
+        userId: session.user.id,
+      },
+    });
+
+    revalidatePath("/library");
+    return playlist;
+  });

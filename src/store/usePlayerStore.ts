@@ -14,7 +14,7 @@ interface PlayerState {
   isPlaying: boolean;
   volume: number;
   progress: number;
-  setCurrentTrack: (track: Track) => void;
+  setCurrentTrack: (track: Track | null) => void;
   setQueue: (queue: Track[]) => void;
   setIsPlaying: (isPlaying: boolean) => void;
   setVolume: (volume: number) => void;
@@ -29,7 +29,11 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   isPlaying: false,
   volume: 0.5,
   progress: 0,
-  setCurrentTrack: (track) => set({ currentTrack: track, isPlaying: true, progress: 0 }),
+  setCurrentTrack: (track) => set({ 
+    currentTrack: track, 
+    isPlaying: !!track, 
+    progress: 0 
+  }),
   setQueue: (queue) => set({ queue }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   setVolume: (volume) => set({ volume }),

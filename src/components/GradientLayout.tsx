@@ -39,11 +39,11 @@ export default function GradientLayout({
             </div>
           )}
           <div className="flex flex-col gap-2">
-            <span className="text-sm font-bold uppercase tracking-wider">{subtitle}</span>
-            <h1 className="text-4xl md:text-6xl lg:text-8xl font-black tracking-tighter">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">{subtitle}</span>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter text-white display leading-none">
               {title}
             </h1>
-            {description && <p className="text-sm text-zinc-300 mt-2">{description}</p>}
+            {description && <p className="text-sm text-white/40 mt-3 font-medium max-w-xl">{description}</p>}
           </div>
         </div>
         

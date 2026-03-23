@@ -3,22 +3,38 @@ import GradientLayout from "@/components/GradientLayout";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { Prisma } from "@prisma/client";
+import SongList from "@/components/SongList";
 
 // Define the precise type for an artist with its nested songs
 type ArtistWithSongs = Prisma.ArtistGetPayload<{
-  include: { songs: true };
+  include: { songs: { include: { artist: true } } };
 }>;
 
 export default async function HomePage() {
   const session = await auth();
-  const artists = await prisma.artist.findMany({
-    include: { songs: true },
-  }) as ArtistWithSongs[];
+  const userId = session?.user?.id;
+
+  const [artists, user] = await Promise.all([
+    prisma.artist.findMany({
+      include: { songs: { include: { artist: true } } },
+    }) as Promise<ArtistWithSongs[]>,
+    userId ? prisma.user.findUnique({
+      where: { id: userId },
+      include: { 
+        likedSongs: { select: { id: true } },
+        playlists: { select: { id: true, name: true } }
+      }
+    }) : Promise.resolve(null)
+  ]);
+
+  const allRecentSongs = artists.flatMap(a => a.songs).slice(0, 10);
+  const likedSongIds = user?.likedSongs.map(s => s.id) || [];
+  const playlists = user?.playlists || [];
 
   return (
     <DashboardLayout>
       <GradientLayout
-        color="red"
+        color="#e8351e"
         title="Welcome Back"
         subtitle="Your personalized home"
       >
@@ -26,36 +42,24 @@ export default async function HomePage() {
           {artists.map((artist) => (
             <div 
                key={artist.id}
-               className="bg-zinc-900/40 p-4 rounded-lg hover:bg-zinc-800/80 transition-all cursor-pointer group shadow-lg"
+               className="bg-white/5 border border-white/5 p-5 rounded-3xl hover:bg-white/10 hover:border-white/10 transition-all cursor-pointer group shadow-lg noise"
             >
-              <div className="aspect-square bg-zinc-800 rounded-full mb-4 overflow-hidden relative shadow-xl">
-                 <div className="absolute inset-0 bg-gradient-to-br from-accent/20 to-transparent group-hover:from-accent/40 transition-all"></div>
+              <div className="aspect-square bg-white/5 border border-white/5 rounded-full mb-5 overflow-hidden relative shadow-2xl">
+                 <div className="absolute inset-0 bg-gradient-to-br from-[#e8351e]/20 to-transparent group-hover:from-[#e8351e]/40 transition-all"></div>
               </div>
-              <h3 className="font-bold text-white truncate">{artist.name}</h3>
-              <p className="text-zinc-400 text-sm">Artist</p>
+              <h3 className="font-bold text-white text-sm tracking-tight truncate group-hover:text-[#e8351e] transition-colors">{artist.name}</h3>
+              <p className="text-white/20 text-[10px] font-bold uppercase tracking-widest mt-1">Artist</p>
             </div>
           ))}
         </div>
 
-        <section className="mt-12">
-           <h2 className="text-2xl font-bold mb-6">Recently Added</h2>
-           <div className="space-y-2">
-              {artists[0]?.songs.map((song) => (
-                <div 
-                   key={song.id}
-                   className="flex items-center gap-4 p-2 hover:bg-white/10 rounded-md group transition-colors cursor-pointer"
-                >
-                  <div className="w-10 h-10 bg-zinc-800 rounded flex items-center justify-center shrink-0">
-                    <div className="w-4 h-4 bg-accent/40 rounded-sm"></div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white truncate">{song.name}</div>
-                    <div className="text-xs text-zinc-400 truncate">{artists[0].name}</div>
-                  </div>
-                  <div className="text-xs text-zinc-500">{Math.floor(song.duration / 60)}:{(song.duration % 60).toString().padStart(2, '0')}</div>
-                </div>
-              ))}
-           </div>
+        <section className="mt-20">
+           <h2 className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-8 ml-2">Recently Added</h2>
+           <SongList 
+              songs={allRecentSongs} 
+              likedSongIds={likedSongIds}
+              playlists={playlists}
+           />
         </section>
       </GradientLayout>
     </DashboardLayout>

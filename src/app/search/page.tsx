@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import SongList from "@/components/SongList";
 import { useQuery } from "@tanstack/react-query";
+import { getUserMetadata } from "@/app/actions/music";
 
 async function searchTracks(query: string) {
   if (!query) return [];
@@ -27,15 +28,20 @@ export default function SearchPage() {
     enabled: debouncedQuery.length > 0,
   });
 
+  const { data: userMetadata } = useQuery({
+    queryKey: ["user-metadata"],
+    queryFn: () => getUserMetadata(),
+  });
+
   return (
     <DashboardLayout>
-      <div className="h-full bg-zinc-900/10 p-8 pt-20">
-        <div className="relative max-w-xl mb-12">
-           <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
+      <div className="h-full bg-[#111]/50 p-10 pt-24 noise">
+        <div className="relative max-w-2xl mb-16">
+           <SearchIcon className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20 w-5 h-5 group-focus-within:text-[#e8351e] transition-colors" />
            <input 
               type="text" 
-              placeholder="What do you want to listen to?" 
-              className="w-full bg-zinc-800/50 border border-zinc-700/50 rounded-full py-4 pl-12 pr-6 text-white text-lg focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all"
+              placeholder="Search for tracks and artists..." 
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-16 pr-8 text-white text-xl font-medium focus:outline-none focus:border-[#e8351e]/50 focus:bg-white/10 transition-all placeholder:text-white/10 shadow-2xl"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
            />
@@ -43,21 +49,28 @@ export default function SearchPage() {
 
         {debouncedQuery && (
           <div>
-            <h2 className="text-2xl font-bold mb-6">Results for &quot;{debouncedQuery}&quot;</h2>
+            <h2 className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 mb-8 ml-6">Results for &quot;{debouncedQuery}&quot;</h2>
             {isLoading ? (
-               <div className="text-zinc-500">Searching...</div>
+               <div className="text-white/20 font-bold uppercase tracking-widest text-xs ml-6">Searching...</div>
             ) : results.length > 0 ? (
-               <SongList songs={results} />
+               <SongList 
+                  songs={results} 
+                  likedSongIds={userMetadata?.data?.likedSongIds}
+                  playlists={userMetadata?.data?.playlists}
+               />
             ) : (
-               <div className="text-zinc-500">No tracks found matching your search.</div>
+               <div className="text-white/20 font-bold uppercase tracking-widest text-xs ml-6">No tracks found matching your search.</div>
             )}
           </div>
         )}
 
         {!debouncedQuery && (
            <div className="flex flex-col items-center justify-center h-[50vh] text-center">
-              <SearchIcon className="w-16 h-16 text-zinc-800 mb-4" />
-              <h2 className="text-xl font-medium text-zinc-400">Search for tracks and artists</h2>
+              <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mb-8 border border-white/5 relative overflow-hidden group">
+                 <div className="absolute inset-0 bg-gradient-to-br from-[#e8351e]/10 to-transparent"></div>
+                 <SearchIcon className="w-8 h-8 text-white/20 group-hover:text-[#e8351e] group-hover:scale-110 transition-all" />
+              </div>
+              <h2 className="text-sm font-bold text-white/20 uppercase tracking-[0.3em]">Start your search</h2>
            </div>
         )}
       </div>

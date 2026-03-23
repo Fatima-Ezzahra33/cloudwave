@@ -70,84 +70,95 @@ export default function AuthForm({ type }: AuthFormProps) {
   };
 
   return (
-    <div className="w-full max-w-md p-8 space-y-6 bg-zinc-900/50 rounded-xl border border-zinc-800 backdrop-blur-md">
-      <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">
-          {type === "signup" ? "Create an account" : "Welcome back"}
+    <div className="w-full max-w-md p-10 space-y-8 bg-zinc-900/40 rounded-3xl border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden noise dot-grid">
+      <div className="text-center space-y-4">
+        <div className="flex justify-center mb-2">
+          <div className="w-10 h-10 rounded-full bg-[#e8351e] flex items-center justify-center shadow-lg shadow-[#e8351e]/20">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+              <path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z" />
+            </svg>
+          </div>
+        </div>
+        <h2 className="text-4xl font-extrabold tracking-tight text-white display">
+          {type === "signup" ? "Get Started" : "Welcome Back"}
         </h2>
-        <p className="text-zinc-400">
+        <p className="text-white/50 text-sm font-medium">
           {type === "signup"
-            ? "Enter your details to join Cloudwave"
-            : "Enter your credentials to access your library"}
+            ? "Join the wave of fresh music"
+            : "Sign in to continue your vibe"}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
         {type === "signup" && (
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">First Name</label>
+              <label className="text-xs font-bold uppercase tracking-widest text-white/40 ml-1">First Name</label>
               <input
                 {...register("firstName")}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-white"
+                placeholder="John"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#e8351e]/50 focus:bg-white/10 transition-all text-sm"
               />
-              {errors.firstName && <p className="text-xs text-red-500">{errors.firstName.message as string}</p>}
+              {errors.firstName && <p className="text-[10px] font-bold text-[#e8351e] mt-1 ml-1 uppercase">{errors.firstName.message as string}</p>}
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Last Name</label>
+              <label className="text-xs font-bold uppercase tracking-widest text-white/40 ml-1">Last Name</label>
               <input
                 {...register("lastName")}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-white"
+                placeholder="Doe"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#e8351e]/50 focus:bg-white/10 transition-all text-sm"
               />
-              {errors.lastName && <p className="text-xs text-red-500">{errors.lastName.message as string}</p>}
+              {errors.lastName && <p className="text-[10px] font-bold text-[#e8351e] mt-1 ml-1 uppercase">{errors.lastName.message as string}</p>}
             </div>
           </div>
         )}
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Email</label>
+          <label className="text-xs font-bold uppercase tracking-widest text-white/40 ml-1">Email Address</label>
           <input
             {...register("email")}
             type="email"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-white"
+            placeholder="name@example.com"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#e8351e]/50 focus:bg-white/10 transition-all text-sm"
           />
-          {errors.email && <p className="text-xs text-red-500">{errors.email.message as string}</p>}
+          {errors.email && <p className="text-[10px] font-bold text-[#e8351e] mt-1 ml-1 uppercase">{errors.email.message as string}</p>}
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium">Password</label>
+          <label className="text-xs font-bold uppercase tracking-widest text-white/40 ml-1">Password</label>
           <input
             {...register("password")}
             type="password"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-white"
+            placeholder="••••••••"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-[#e8351e]/50 focus:bg-white/10 transition-all text-sm"
           />
-          {errors.password && <p className="text-xs text-red-500">{errors.password.message as string}</p>}
+          {errors.password && <p className="text-[10px] font-bold text-[#e8351e] mt-1 ml-1 uppercase">{errors.password.message as string}</p>}
         </div>
 
-        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
+        {error && <p className="text-xs font-bold text-[#e8351e] text-center bg-[#e8351e]/10 py-2 rounded-lg">{error}</p>}
 
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-accent hover:bg-accent/90 text-white font-bold py-3 rounded-full transition-all"
+          className="w-full bg-[#e8351e] hover:bg-[#c8291a] text-white font-bold py-4 rounded-full transition-all shadow-lg shadow-[#e8351e]/20 active:scale-[0.98]"
         >
-          {isSubmitting ? "Processing..." : type === "signup" ? "Sign Up" : "Sign In"}
+          {isSubmitting ? "Processing..." : type === "signup" ? "Create Account" : "Sign In"}
         </Button>
       </form>
 
-      <div className="text-center text-sm text-zinc-400">
+      <div className="text-center text-xs font-medium text-white/40 relative z-10">
         {type === "signup" ? (
           <>
-            Already have an account?{" "}
-            <Link href="/signin" className="text-accent hover:underline">
+            Already a member?{" "}
+            <Link href="/signin" className="text-white hover:text-[#e8351e] font-bold transition-colors">
               Sign In
             </Link>
           </>
         ) : (
           <>
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-accent hover:underline">
-              Sign Up
+            New to Cloudwave?{" "}
+            <Link href="/signup" className="text-white hover:text-[#e8351e] font-bold transition-colors">
+              Join Now
             </Link>
           </>
         )}

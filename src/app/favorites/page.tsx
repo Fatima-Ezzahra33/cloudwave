@@ -8,24 +8,33 @@ export default async function FavoritesPage() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  const user = await prisma.user.findUnique({
+  const userData = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
       likedSongs: {
         include: { artist: true },
+        orderBy: { createdAt: 'desc' }
       },
+      playlists: { select: { id: true, name: true } }
     },
   });
+
+  const likedSongIds = userData?.likedSongs.map(s => s.id) || [];
+  const playlists = userData?.playlists || [];
 
   return (
     <DashboardLayout>
       <GradientLayout
-        color="#5038a0"
+        color="#e8351e"
         title="Liked Songs"
         subtitle="Playlist"
-        description={`${user?.likedSongs.length || 0} songs`}
+        description={`${userData?.likedSongs.length || 0} songs`}
       >
-        <SongList songs={user?.likedSongs || []} />
+        <SongList 
+          songs={userData?.likedSongs || []} 
+          likedSongIds={likedSongIds}
+          playlists={playlists}
+        />
       </GradientLayout>
     </DashboardLayout>
   );
