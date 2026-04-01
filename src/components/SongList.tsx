@@ -5,6 +5,8 @@ import { Play, Heart, Plus, ListMusic } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toggleLikeSong, addSongToPlaylist } from "@/app/actions/music";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 interface Song {
   id: string;
@@ -24,6 +26,8 @@ interface SongListProps {
 export default function SongList({ songs, likedSongIds = [], playlists = [] }: SongListProps) {
   const { setCurrentTrack, setQueue, currentTrack, isPlaying, setIsPlaying } = usePlayerStore();
   const [showPlaylistMenu, setShowPlaylistMenu] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handlePlay = (song: Song) => {
     if (currentTrack?.id === song.id) {
@@ -81,6 +85,10 @@ export default function SongList({ songs, likedSongIds = [], playlists = [] }: S
                     e.stopPropagation();
                     try {
                       await toggleLikeSong({ songId: song.id });
+                      // Invalidate query to update Heart icon in Search/other client pages
+                      queryClient.invalidateQueries({ queryKey: ["user-metadata"] });
+                      // Also refresh for Server Components (Home page)
+                      router.refresh();
                     } catch (error) {
                       console.error("Failed to like song:", error);
                     }
@@ -117,6 +125,8 @@ export default function SongList({ songs, likedSongIds = [], playlists = [] }: S
                             onClick={async () => {
                               try {
                                 await addSongToPlaylist({ songId: song.id, playlistId: p.id });
+                                queryClient.invalidateQueries({ queryKey: ["user-metadata"] });
+                                router.refresh();
                                 setShowPlaylistMenu(null);
                               } catch (err) {
                                 console.error("Failed to add to playlist", err);

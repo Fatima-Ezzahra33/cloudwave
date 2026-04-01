@@ -20,7 +20,9 @@ export const toggleLikeSong = actionClient
       include: { likedSongs: { where: { id: songId } } },
     });
 
-    if (user?.likedSongs.length) {
+    if (!user) throw new Error("User not found in database. Please sign out and sign back in.");
+
+    if (user.likedSongs.length) {
       // Unlike
       await prisma.user.update({
         where: { id: userId },
@@ -42,6 +44,8 @@ export const toggleLikeSong = actionClient
       });
     }
 
+    revalidatePath("/", "layout");
+    revalidatePath("/search");
     revalidatePath("/favorites");
     revalidatePath("/home");
     return { success: true };
@@ -72,6 +76,7 @@ export const addSongToPlaylist = actionClient
       },
     });
 
+    revalidatePath("/", "layout");
     revalidatePath(`/playlist/${playlistId}`);
     return { success: true };
   });

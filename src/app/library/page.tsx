@@ -2,14 +2,14 @@ import DashboardLayout from "@/components/DashboardLayout";
 import GradientLayout from "@/components/GradientLayout";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
-import SuperLibraryClient from "@/components/SuperLibraryClient";
 import LibraryClient from "@/components/SuperLibraryClient";
 import { getPresignedUrl } from "@/lib/minio";
+import { redirect } from "next/navigation";
 
 
 export default async function LibraryPage() {
   const session = await auth();
-  if (!session?.user?.id) return null;
+  if (!session?.user?.id) redirect("/signin");
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -23,7 +23,7 @@ export default async function LibraryPage() {
     },
   });
 
-  if (!user) return null;
+  if (!user) redirect("/signin");
 
   const playlistsWithSignedUrls = await Promise.all(
     user.playlists.map(async (playlist) => ({

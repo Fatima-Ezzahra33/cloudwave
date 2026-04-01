@@ -6,9 +6,12 @@ import SongList from "@/components/SongList";
 import { getPresignedUrl } from "@/lib/minio";
 
 
+import { redirect } from "next/navigation";
+
+
 export default async function FavoritesPage() {
   const session = await auth();
-  if (!session?.user?.id) return null;
+  if (!session?.user?.id) redirect("/signin");
 
   const userData = await prisma.user.findUnique({
     where: { id: session.user.id },
