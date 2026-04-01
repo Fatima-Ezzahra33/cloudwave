@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getPresignedUrl } from "@/lib/minio";
+
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -21,5 +23,13 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json(songs);
+  const songsWithUrls = await Promise.all(
+    songs.map(async (song) => ({
+      ...song,
+      url: await getPresignedUrl(song.url),
+    }))
+  );
+
+  return NextResponse.json(songsWithUrls);
+
 }

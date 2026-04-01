@@ -4,6 +4,8 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import { Prisma } from "@prisma/client";
 import SongList from "@/components/SongList";
+import { getPresignedUrl } from "@/lib/minio";
+
 
 // Define the precise type for an artist with its nested songs
 type ArtistWithSongs = Prisma.ArtistGetPayload<{
@@ -27,8 +29,16 @@ export default async function HomePage() {
     }) : Promise.resolve(null)
   ]);
 
-  const allRecentSongs = artists.flatMap(a => a.songs).slice(0, 10);
+  const allRecentSongsRaw = artists.flatMap(a => a.songs).slice(0, 10);
+  const allRecentSongs = await Promise.all(
+    allRecentSongsRaw.map(async (song) => ({
+      ...song,
+      url: await getPresignedUrl(song.url),
+    }))
+  );
+
   const likedSongIds = user?.likedSongs.map(s => s.id) || [];
+
   const playlists = user?.playlists || [];
 
   return (

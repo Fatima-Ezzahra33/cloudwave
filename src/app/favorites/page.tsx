@@ -3,6 +3,8 @@ import GradientLayout from "@/components/GradientLayout";
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 import SongList from "@/components/SongList";
+import { getPresignedUrl } from "@/lib/minio";
+
 
 export default async function FavoritesPage() {
   const session = await auth();
@@ -20,7 +22,16 @@ export default async function FavoritesPage() {
   });
 
   const likedSongIds = userData?.likedSongs.map(s => s.id) || [];
+  
+  const songs = await Promise.all(
+    (userData?.likedSongs || []).map(async (song) => ({
+      ...song,
+      url: await getPresignedUrl(song.url),
+    }))
+  );
+
   const playlists = userData?.playlists || [];
+
 
   return (
     <DashboardLayout>
@@ -31,10 +42,11 @@ export default async function FavoritesPage() {
         description={`${userData?.likedSongs.length || 0} songs`}
       >
         <SongList 
-          songs={userData?.likedSongs || []} 
+          songs={songs} 
           likedSongIds={likedSongIds}
           playlists={playlists}
         />
+
       </GradientLayout>
     </DashboardLayout>
   );

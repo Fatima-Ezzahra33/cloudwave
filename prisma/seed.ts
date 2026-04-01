@@ -111,7 +111,7 @@ async function main() {
       name: "Cloudwave Favorites",
       userId: user.id,
       songs: {
-        connect: allSongs.map((s) => ({ id: s.id })),
+        connect: allSongs.map((s: { id: string }) => ({ id: s.id })),
       },
     },
   });

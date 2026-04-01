@@ -5,6 +5,8 @@ import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SongList from "@/components/SongList";
 import { auth } from "@/auth";
+import { getPresignedUrl } from "@/lib/minio";
+
 
 export default async function PlaylistPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
@@ -31,7 +33,15 @@ export default async function PlaylistPage(props: { params: Promise<{ id: string
 
   if (!playlist) return <div>Playlist not found</div>;
 
+  const songs = await Promise.all(
+    playlist.songs.map(async (song) => ({
+      ...song,
+      url: await getPresignedUrl(song.url),
+    }))
+  );
+
   const likedSongIds = user?.likedSongs.map(s => s.id) || [];
+
   const playlists = user?.playlists || [];
 
   return (
@@ -49,10 +59,11 @@ export default async function PlaylistPage(props: { params: Promise<{ id: string
         </div>
 
         <SongList 
-          songs={playlist.songs} 
+          songs={songs} 
           likedSongIds={likedSongIds}
           playlists={playlists}
         />
+
       </GradientLayout>
     </DashboardLayout>
   );
