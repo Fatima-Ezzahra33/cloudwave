@@ -11,6 +11,7 @@ interface Song {
   id: string;
   name: string;
   url: string;
+  coverUrl?: string | null;
   duration: number;
   artist: { name: string };
 }

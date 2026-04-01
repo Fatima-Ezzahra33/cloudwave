@@ -30,8 +30,9 @@ model Artist {
 model Song {
   id        String     @id @default(cuid())
   name      String
-  duration  Int        // duration in seconds
-  url       String     // MinIO URL or path
+  duration  Int
+  url       String
+  coverUrl  String?    // optional cover image from MinIO
   artistId  String
   artist    Artist     @relation(fields: [artistId], references: [id])
   playlists Playlist[]

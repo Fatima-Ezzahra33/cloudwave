@@ -5,6 +5,7 @@ interface Track {
   name: string;
   artist: { name: string };
   url: string;
+  coverUrl?: string | null;
   duration: number;
 }
 
@@ -29,11 +30,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   isPlaying: false,
   volume: 0.5,
   progress: 0,
-  setCurrentTrack: (track) => set({ 
-    currentTrack: track, 
-    isPlaying: !!track, 
-    progress: 0 
-  }),
+  setCurrentTrack: (track) => set({ currentTrack: track, isPlaying: !!track, progress: 0 }),
   setQueue: (queue) => set({ queue }),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
   setVolume: (volume) => set({ volume }),
