@@ -5,7 +5,39 @@ import bcrypt from "bcryptjs";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
+const MINIO_URL = process.env.MINIO_PUBLIC_URL || "http://localhost:9000";
+
 const artistsData = [
+  {
+    name: "d4vd",
+    songs: [
+      {
+        name: "Romantic Homicide",
+        duration: 175,
+        url: `${MINIO_URL}/music/d4vd%20-%20Romantic%20Homicide.mp3`,
+      },
+    ],
+  },
+  {
+    name: "Indila",
+    songs: [
+      {
+        name: "Love Story",
+        duration: 210,
+        url: `${MINIO_URL}/music/Indila%20-%20Love%20Story%20(Official%20Music%20Video).mp3`,
+      },
+    ],
+  },
+  {
+    name: "Billie Eilish",
+    songs: [
+      {
+        name: "WILDFLOWER",
+        duration: 195,
+        url: `${MINIO_URL}/music/Billie%20Eilish%20-%20WILDFLOWER%20(Official%20Lyric%20Video).mp3`,
+      },
+    ],
+  },
   {
     name: "Glitch",
     songs: [
@@ -62,6 +94,7 @@ const artistsData = [
     ],
   },
 ];
+
 
 async function main() {
   const passwordHash = await bcrypt.hash("password123", 10);
